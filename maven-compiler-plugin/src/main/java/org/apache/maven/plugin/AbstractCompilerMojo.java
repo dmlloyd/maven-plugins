@@ -49,6 +49,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.tools.Diagnostic;
+
 /**
  * TODO: At least one step could be optimized, currently the plugin will do two
  * scans of all the source code if the compiler has to have the entire set of
@@ -662,23 +664,32 @@ public abstract class AbstractCompilerMojo
 
         List<CompilerError> warnings = new ArrayList<CompilerError>();
         List<CompilerError> errors = new ArrayList<CompilerError>();
+        List<CompilerError> others = new ArrayList<CompilerError>();
         if ( messages != null )
         {
             for ( CompilerError message : messages )
             {
-                if ( message.isError() )
+                if ( message.getKind() == Diagnostic.Kind.ERROR )
                 {
                     errors.add( message );
                 }
-                else
+                else if ( message.getKind() == Diagnostic.Kind.WARNING || message.getKind() == Diagnostic.Kind.MANDATORY_WARNING )
                 {
                     warnings.add( message );
+                }
+                else
+                {
+                    others.add( message );
                 }
             }
         }
 
         if ( failOnError && !errors.isEmpty() )
         {
+            for ( CompilerError other : others )
+            {
+                getLog().info( other.toString() );
+            }
             if ( !warnings.isEmpty() )
             {
                 getLog().info( "-------------------------------------------------------------" );
@@ -709,7 +720,12 @@ public abstract class AbstractCompilerMojo
         {
             for ( CompilerError message : messages )
             {
-                getLog().warn( message.toString() );
+                switch (message.getKind()) {
+                    case ERROR: getLog().error( message.toString() ); break;
+                    case MANDATORY_WARNING:
+                    case WARNING: getLog().warn( message.toString() ); break;
+                    default: getLog().info( message.toString() ); break;
+                }
             }
         }
     }
