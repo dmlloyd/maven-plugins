@@ -615,7 +615,7 @@ public abstract class AbstractCompilerMojo
                 {
                     if ( compilerConfiguration.getExecutable() != null )
                     {
-                        getLog().debug( "Excutable: " );
+                        getLog().debug( "Executable: " );
                         getLog().debug( " " + compilerConfiguration.getExecutable() );
                     }
                 }
