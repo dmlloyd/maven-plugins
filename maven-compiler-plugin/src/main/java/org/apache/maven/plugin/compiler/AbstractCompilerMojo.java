@@ -41,6 +41,7 @@ import org.codehaus.plexus.compiler.CompilerMessage;
 import org.codehaus.plexus.compiler.CompilerNotImplementedException;
 import org.codehaus.plexus.compiler.CompilerOutputStyle;
 import org.codehaus.plexus.compiler.CompilerResult;
+import org.codehaus.plexus.compiler.Processor;
 import org.codehaus.plexus.compiler.manager.CompilerManager;
 import org.codehaus.plexus.compiler.manager.NoSuchCompilerException;
 import org.codehaus.plexus.compiler.util.scan.InclusionScanException;
@@ -213,6 +214,14 @@ public abstract class AbstractCompilerMojo
      */
     @Parameter
     private String[] annotationProcessors;
+
+    /**
+     * Annotation processors (supercedes {@link #annotationProcessors} if present).
+     *
+     * @since 3.3
+     */
+    @Parameter
+    private List<Processor> processors = new ArrayList<Processor>();
 
     /**
      * <p>
@@ -539,9 +548,13 @@ public abstract class AbstractCompilerMojo
             }
         }
 
+        compilerConfiguration.setProject( project );
+
         compilerConfiguration.setSourceLocations( compileSourceRoots );
 
         compilerConfiguration.setAnnotationProcessors( annotationProcessors );
+
+        compilerConfiguration.setProcessors( processors );
 
         compilerConfiguration.setSourceEncoding( encoding );
 
